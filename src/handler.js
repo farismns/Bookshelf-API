@@ -81,12 +81,12 @@ const getAllBooksHandler = (request, h) => {
 
   if (reading !== undefined) {
     const isReading = reading === '1';
-    filteredBooks = filteredBooks.filter((book) => (book.reading === isReading) === (reading === '1'));
+    filteredBooks = filteredBooks.filter((book) => book.reading === isReading);
   }
 
   if (finished !== undefined) {
     const isFinished = finished === '1';
-    filteredBooks = filteredBooks.filter((book) => (book.finished === isFinished) === (finished === '1'));
+    filteredBooks = filteredBooks.filter((book) => book.finished === isFinished);
   }
 
   const bookList = filteredBooks.map((book) => ({
@@ -191,4 +191,30 @@ const editBookByIdHandler = (request, h) => {
   return response;
 };
 
-module.exports = { addBookHandler, getAllBooksHandler, getBookByIdHandler, editBookByIdHandler };
+const deleteBookByIdHandler = (request, h) => {
+  const { bookId } = request.params;
+
+  const index = books.findIndex((book) => book.id === bookId);
+
+  if (index === -1) {
+    const response = h.response({
+      status: 'fail',
+      message: 'Buku gagal dihapus. Id tidak ditemukan',
+    });
+
+    response.code(404);
+    return response;
+  }
+
+  books.splice(index, 1);
+
+  const response = h.response({
+    status: 'success',
+    message: 'Buku berhasil dihapus',
+  });
+
+  response.code(200);
+  return response;
+};
+
+module.exports = { addBookHandler, getAllBooksHandler, getBookByIdHandler, editBookByIdHandler, deleteBookByIdHandler };
